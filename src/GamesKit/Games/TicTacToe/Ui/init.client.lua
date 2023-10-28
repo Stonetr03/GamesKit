@@ -2,6 +2,7 @@
 
 local Fusion = require(game.ReplicatedStorage:WaitForChild("AdminCube"):WaitForChild("Fusion"))
 local Api = require(game.ReplicatedStorage:WaitForChild("AdminCube"):WaitForChild("Api"))
+local HowTo = require(game.ReplicatedStorage:WaitForChild("AdminCube"):WaitForChild("GamesKit"):WaitForChild("HowTo"))
 
 local New = Fusion.New
 local Value = Fusion.Value
@@ -52,7 +53,7 @@ local Window = Api:CreateWindow({
         [1] = {
             Text = "?";
             Callback = function()
-                
+                HowTo:ShowGui("Tic-Tac-Toe")
             end
         };
     };

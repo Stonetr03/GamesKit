@@ -25,6 +25,7 @@ local ActiveGames = {}
 
 local RS = Api:CreateRSFolder("GamesKit")
 script:WaitForChild("Markdown").Parent = RS
+script:WaitForChild("HowTo").Parent = RS
 Create("StringValue",RS,{Value = HttpService:JSONEncode(GamesList),Name = "GamesList"})
 
 for _,o in pairs(script:WaitForChild("Games"):GetChildren()) do
@@ -182,6 +183,13 @@ game.Players.PlayerRemoving:Connect(function(p)
             end
         end
     end
+end)
+
+Api:OnInvoke("GamesKit-getHowTo",function(p,name)
+    if GameInfo[name] and GameInfo[name].HowToPlay then
+        return GameInfo[name].HowToPlay
+    end
+    return "*requested game HowToPlay unavaliable*"
 end)
 
 return true

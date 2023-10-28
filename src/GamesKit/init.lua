@@ -18,10 +18,9 @@ local OpenChallenges = {}
 --        Expires = 1;
 --    }
 local ActiveGames = {}
---    [1] = {
+--    [UUID HASH] = {
 --        Type = "Chess";
 --        Players = {p1,p2};
---        Id = "HTTP-UUID";
 --    }
 
 local RS = Api:CreateRSFolder("GamesKit")
@@ -31,6 +30,11 @@ Create("StringValue",RS,{Value = HttpService:JSONEncode(GamesList),Name = "Games
 for _,o in pairs(script:WaitForChild("Games"):GetChildren()) do
     local info = require(o)
     GameInfo[info.Name] = info
+    info.StopGame = function(hash)
+        if ActiveGames[hash] then
+            ActiveGames[hash] = nil;
+        end
+    end
 end
 
 local ReqCooldown = {}
@@ -52,11 +56,31 @@ Api:OnInvoke("GamesKit-GetInfo",function(p,Args)
     return {}
 end)
 
+function ShuffleTable(t)
+	local shuffled = table.clone(t)
+
+	for i = #shuffled, 2, -1 do
+		local randomGenerator = Random.new()
+		local randomIndex = math.random(randomGenerator:NextInteger(1, i))
+		shuffled[i], shuffled[randomIndex] = shuffled[randomIndex], shuffled[i]
+	end
+
+	return shuffled
+end
+
 function StartGame(plrs,gameName)
+    plrs = ShuffleTable(plrs)
     for _,p in pairs(plrs) do
         Api:Notification(p,GameInfo[gameName].Image,"Starting game " .. gameName .. ".")
     end
     -- Start Game
+    local hash = HttpService:GenerateGUID(true);
+    local tab = {
+        Type = gameName;
+        Players = plrs;
+    }
+    ActiveGames[hash] = tab;
+    GameInfo[gameName].StartGame(hash,plrs)
 end
 
 -- Challenges
@@ -95,6 +119,17 @@ Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
                     end
                 end
             end
+            -- Check for duplicates
+            local checkplrs = {}
+            for _,plr in pairs(plrs) do
+                if table.find(checkplrs,plr) then
+                    Api:Notification(p,false,"Duplicated Player.")
+                    return
+                else
+                    table.insert(checkplrs,plr)
+                end
+            end
+
             -- Send Challenge
             local challenge = {
                 Type = found;
@@ -128,5 +163,25 @@ Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
         Api:Notification(p,false,"Game not found")
     end
 end,"1;*[string];*[string];",{"play"})
+
+game.Players.PlayerRemoving:Connect(function(p)
+    for h,g in pairs(ActiveGames) do
+        for _,plr in pairs(g.Players) do
+            if plr == p then
+                -- End Game
+                GameInfo[g.Type].EndGame(h,p)
+                ActiveGames[h] = nil;
+            end
+        end
+    end
+    for _,c in pairs(OpenChallenges) do
+        if table.find(c.Players,p) then
+            -- Remove Challenge
+            if table.find(OpenChallenges,c) then
+                table.remove(OpenChallenges,table.find(OpenChallenges,c))
+            end
+        end
+    end
+end)
 
 return true

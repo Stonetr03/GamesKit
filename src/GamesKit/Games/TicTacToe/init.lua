@@ -6,7 +6,7 @@ local ActiveGames = {}
 
 local Module = {
     Name = "Tic-Tac-Toe";
-    Image = "rbxassetid://14388088851";
+    Image = "rbxassetid://15203011711";
     HowToPlay = [=[# How to Play Tic-Tac-Toe
 
 Tic-Tac-Toe is a simple two-player game. The objective is to be the first to get three of your marks (X or O) in a row, either horizontally, vertically, or diagonally.

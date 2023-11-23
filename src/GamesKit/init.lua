@@ -93,6 +93,17 @@ Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
             found = g;
         end
     end
+    if found == false then
+        for n,g in pairs(GameInfo) do
+            if typeof(g.Alias) == "table" then
+                for _,o in pairs(g.Alias) do
+                    if string.lower(o) == Args[1] then
+                        found = n;
+                    end
+                end
+            end
+        end
+    end
     if found ~= false then
         local plrs = Api:GetPlayer(Args[2],p)
         if #plrs == GameInfo[found].PlayersAmt - 1 then

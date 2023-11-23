@@ -6,6 +6,7 @@ local ActiveGames = {}
 
 local Module = {
     Name = "Tic-Tac-Toe";
+    Alias = {"TicTacToe"};
     Image = "rbxassetid://15203011711";
     HowToPlay = [=[# How to Play Tic-Tac-Toe
 

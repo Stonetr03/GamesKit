@@ -344,7 +344,6 @@ function Module:Init()
     Module.Picker.Finished:Connect(function(Color: Color3)
         task.wait()
         Module.Picker.Instance.Parent.Visible = false;
-        print(ActivePicker)
         if ActivePicker == true then
             Pieces.BoardBColor:set(Color)
             CustomB:set(Color)

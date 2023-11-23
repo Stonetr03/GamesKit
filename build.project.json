@@ -4,21 +4,21 @@
     "$className": "DataModel",
     "ServerScriptService": {
       "Loader": {
-        "$path": "src/Loader/test.server.lua",
+        "$path": "src/Loader/load.server.lua",
 
         "Settings": {
           "$path": "src/Loader/Settings.lua"
         },
 
         "Commands": {
-          "$className": "Folder",
-          "GamesKit": {
-            "$path": "src/GamesKit",
+          "$className": "Folder"
+        }
+      },
+      "GamesKit": {
+        "$path": "src/GamesKit",
 
-            "Markdown": {
-              "$path": "external/Markdown"
-            }
-          }
+        "Markdown": {
+          "$path": "external/Markdown"
         }
       }
     }

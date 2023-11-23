@@ -3,4 +3,4 @@
 
 _G.AdminCubeCustomSettings = require(script.Settings)
 
-require(8713742492)(script.Commands)
+require(6490802893)(script.Commands)

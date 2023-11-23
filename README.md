@@ -15,3 +15,5 @@ rojo serve
 ```
 
 For more help, check out [the Rojo documentation](https://rojo.space/docs).
+
+*Requires [AdminCube v2.1.0+](https://github.com/Stonetr03/AdminCube)*

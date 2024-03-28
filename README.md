@@ -29,4 +29,4 @@ rojo serve build.project.json
 - GamesKit uses [Fusion by elttob](https://elttob.uk/Fusion/0.2/)
 - GamesKit uses [Signal by sleitnick](https://github.com/Sleitnick/RbxUtil)
 
-*Requires [AdminCube v2.1.0+](https://github.com/Stonetr03/AdminCube)*
+*Requires [AdminCube v2.2.0+](https://github.com/Stonetr03/AdminCube)*

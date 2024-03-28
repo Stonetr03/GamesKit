@@ -1,5 +1,5 @@
 {
-  "name": "GamesKit",
+  "name": "GamesKit - Build",
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
@@ -14,11 +14,15 @@
           "$className": "Folder"
         }
       },
-      "GamesKit": {
-        "$path": "src/GamesKit",
+      "MainModule": {
+        "$path": "src/Loader/build.lua",
 
-        "Markdown": {
-          "$path": "external/Markdown"
+        "GamesKit": {
+          "$path": "src/GamesKit",
+  
+          "Markdown": {
+            "$path": "external/Markdown"
+          }
         }
       }
     }

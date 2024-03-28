@@ -4,10 +4,7 @@ local Api = require(script.Parent.Parent:WaitForChild("Api"))
 local Create = require(script.Parent.Parent:WaitForChild("CreateModule"))
 local HttpService = game:GetService("HttpService")
 
-local GamesList = {
-    [1] = "Chess";
-    [2] = "Tic-Tac-Toe";
-}
+local GamesList = {}
 
 local GameInfo = {}
 local OpenChallenges = {}
@@ -26,17 +23,19 @@ local ActiveGames = {}
 local RS = Api:CreateRSFolder("GamesKit")
 script:WaitForChild("Markdown").Parent = RS
 script:WaitForChild("HowTo").Parent = RS
-Create("StringValue",RS,{Value = HttpService:JSONEncode(GamesList),Name = "GamesList"})
 
 for _,o in pairs(script:WaitForChild("Games"):GetChildren()) do
     local info = require(o)
     GameInfo[info.Name] = info
+    table.insert(GamesList,info.Name)
     info.StopGame = function(hash)
         if ActiveGames[hash] then
             ActiveGames[hash] = nil;
         end
     end
 end
+
+Create("StringValue",RS,{Value = HttpService:JSONEncode(GamesList),Name = "GamesList"})
 
 local ReqCooldown = {}
 Api:RegisterCommand("games","Shows the list of games.",function(p,Args)
@@ -106,7 +105,7 @@ Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
     end
     if found ~= false then
         local plrs = Api:GetPlayer(Args[2],p)
-        if #plrs == GameInfo[found].PlayersAmt - 1 then
+        if #plrs == GameInfo[found].PlayersAmt - 1 and #plrs ~= 0 then
             -- Check if players is not self
             for _,plr in pairs(plrs) do
                 if plr == p then
@@ -168,6 +167,8 @@ Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
             if table.find(OpenChallenges,challenge) then
                 table.remove(OpenChallenges,table.find(OpenChallenges,challenge))
             end
+        elseif GameInfo[found].PlayersAmt == 1 then
+            StartGame({p},found)
         else
             Api:Notification(p,false,"Invalid amount of players for " .. found .. ", Amount:" .. GameInfo[found].PlayersAmt)
         end

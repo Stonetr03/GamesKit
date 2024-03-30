@@ -69,7 +69,7 @@ local lexerScan = lexer.scan
 
 ---
 
-local bigVector2 = Vector2.new(100000, 100000)
+local bigVector2 = 100000-- Vector2.new(100000, 100000)
 
 local headers = {
     h1 = 36,

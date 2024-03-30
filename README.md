@@ -9,6 +9,7 @@ The GamesKit model can be found [here on roblox](https://create.roblox.com/marke
 
 ## Games List
 - Chess
+- Solitaire
 - Tic-Tac-Toe
 
 ## Building

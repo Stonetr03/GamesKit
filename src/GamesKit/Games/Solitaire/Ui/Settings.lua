@@ -141,7 +141,7 @@ function Module.Ui(SettingsVis)
                 Position = UDim2.new(0.675,0,0.23,0);
                 Size = UDim2.new(0.3,0,0.25,0);
                 Text = "Large";
-                TextColor3 = Color3.new(0.5,0.5,0.5);
+                TextColor3 = Color3.new(1,1,1);
                 TextScaled = true;
                 [Children] = {
                     New "UICorner" {CornerRadius = UDim.new(0.15,0)};

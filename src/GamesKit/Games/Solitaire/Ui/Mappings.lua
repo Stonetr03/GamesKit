@@ -68,9 +68,9 @@ end
 
 -- Images
 local ImgMap = {
-    [1] = {1,1}; -- Normal, Colored
-    [2] = {3,3};
-    [3] = {3,3};
+    [1] = {1,4}; -- Normal, Colored
+    [2] = {3,5};
+    [3] = {6,7};
 }
 function Module:GetImage(Card: string): number
     if Card == "" or Card == "empty" or Card == "B1" or Card == "B2" then

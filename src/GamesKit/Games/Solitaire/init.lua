@@ -12,7 +12,6 @@ local Module = {
 ## **Objective:**
 
 - Move all cards to the foundation piles, building them up in ascending order by suit, starting with the Ace and ending with the King.
-- Move cards by dragging them.
  
 ## **Rules:**
 
@@ -24,7 +23,14 @@ local Module = {
  
 ## **Winning:**
 
-- Successfully move all cards to the foundation piles according to their suits and in ascending order from Ace to King.]=];
+- Successfully move all cards to the foundation piles according to their suits and in ascending order from Ace to King.
+
+## **Keybinds:**
+
+Cards can be moved by either Dragging them, clicking on them, or using a keyboard or gamepad.
+
+> The arrow keys or DPad buttons are used to move your selection around.
+> Pressing space or ButtonA will pick up / set down cards,  and the N/M keys and L1 and R1 buttons can be used to increase/decrease the cards picked up.]=];
     PlayersAmt = 1;
 
     StartGame = nil;

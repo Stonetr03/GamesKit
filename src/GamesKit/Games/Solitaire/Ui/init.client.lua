@@ -164,6 +164,7 @@ function DiscardUi(): ImageButton
 
     local moved = false
     local Position = Value(UDim2.new(0.02*2 + 0.12*1,0,0.015,0))
+    local ZIndex = Value(3)
 
     local function update(input)
         moved = true
@@ -194,7 +195,7 @@ function DiscardUi(): ImageButton
             end
             return Vector2.new(200*Images["empty"][2].X,280*Images["empty"][2].Y);
         end);
-        ZIndex = 3;
+        ZIndex = ZIndex;
         [Children] = {
             New "UICorner" {CornerRadius = UDim.new(0.05,0)};
             New "UIStroke" {
@@ -219,12 +220,14 @@ function DiscardUi(): ImageButton
                 moved = false
                 dragStart = input.Position
                 startPos = Position:get()
+                ZIndex:set(4)
 
                 local con
                 con = input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         dragging = false
                         con:Disconnect()
+                        ZIndex:set(3)
                         if moved then
                             local a,b = GetDropZone(input.Position)
                             if a == 1 then
@@ -365,6 +368,7 @@ function Restart()
     KeyboardSelection:set("00");
     KeyboardEditMode:set(0);
     KeyboardEditSelection:set("");
+    ActiveInput:set("Keyboard")
     Status:set(1);
     StartTime = os.time()
     EndTime = 0;
@@ -379,6 +383,7 @@ function PileUi(i)
 
     local moved = false
     local Position = Value(UDim2.new(0.02*(3+i) + 0.12*(2+i),0,0.015,0))
+    local ZIndex = Value(3)
 
     local function update(input)
         moved = true
@@ -411,7 +416,7 @@ function PileUi(i)
             end
             return Vector2.new(200*Images["empty"][2].X,280*Images["empty"][2].Y);
         end);
-        ZIndex = 3;
+        ZIndex = ZIndex;
         [Fusion.Out "AbsoluteSize"] = RefSize.Piles[i];
         [Fusion.Out "AbsolutePosition"] = RefPosition.Piles[i];
         [Children] = {
@@ -438,12 +443,14 @@ function PileUi(i)
                 moved = false
                 dragStart = input.Position
                 startPos = Position:get()
+                ZIndex:set(4)
 
                 local con
                 con = input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         dragging = false
                         con:Disconnect()
+                        ZIndex:set(3)
                         if moved then
                             local a,b = GetDropZone(input.Position)
                             if a == 1 then
@@ -538,11 +545,12 @@ end
 function ColUi(c)
     local Moving = Value(0);
     local Position = Value(UDim2.new(0,0,0,0));
+    local ZIndex = Value(3)
     return New "Frame" {
         Size = UDim2.new(0.12,0,0.76,0);
         Position = UDim2.new(0.02 * c + (0.12 * (c-1)),0,0.22,0);
         BackgroundTransparency = 0.9;
-        ZIndex = 3;
+        ZIndex = ZIndex;
         [Fusion.Out "AbsoluteSize"] = RefSize.Cols[c];
         [Fusion.Out "AbsolutePosition"] = RefPosition.Cols[c];
 
@@ -646,6 +654,7 @@ function ColUi(c)
                             moved = false
                             dragStart = input.Position
                             Moving:set(i)
+                            ZIndex:set(4)
 
 
                             local con
@@ -653,6 +662,7 @@ function ColUi(c)
                                 if input.UserInputState == Enum.UserInputState.End then
                                     dragging = false
                                     con:Disconnect()
+                                    ZIndex:set(3)
                                     if moved then
                                         local a,b = GetDropZone(input.Position)
                                         if a == 1 then

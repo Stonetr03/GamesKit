@@ -22,6 +22,7 @@ Tic-Tac-Toe is a simple two-player game. The objective is to be the first to get
 
 To win, you must create a row, column, or diagonal of three of your marks before your opponent does. The first player to do so is the winner.]=];
     PlayersAmt = 2;
+    PlayersRequired = true;
 
     StartGame = function(hash: string,plrs: table)
         ActiveGames[hash] = {

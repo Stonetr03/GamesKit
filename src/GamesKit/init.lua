@@ -3,22 +3,36 @@
 local Api = require(script.Parent.Parent:WaitForChild("Api"))
 local Create = require(script.Parent.Parent:WaitForChild("CreateModule"))
 local HttpService = game:GetService("HttpService")
+local invites = require(script:WaitForChild("invites"));
 
-local GamesList = {}
+export type hash = string;
+export type ActiveGame = {
+    Type: string;
+    Players: {Players};
+    Public: boolean; -- Weather the game can be joined using !join
+    Pending: boolean; -- Allows players to join game.
+}
+
+export type GameInfo = {
+    Name: string;
+    Alias: {string};
+    Image: string;
+    HowToPlay: string;
+
+    PlayersAmt: number;
+    PlayersRequired: boolean?; -- Indicates if a game is a duel, only works for 2 player games.
+
+    StartGame: (hash: string, plrs: {Player}) -> ();
+    EndGame: (hash: string, p: Player?) -> ();
+    StopGame: (hash: string) -> (); -- NOTE: This function is added by this script, not by the game's script.
+    AddPlayer: (hash: string, p: Player) -> ();
+}
+
+local GamesList = {} :: {[string]: GameInfo}
 
 local GameInfo = {}
-local OpenChallenges = {}
---    [1] = {
---        Type = "Chess";
---        Sender = p1;
---        Players = {p1,p2};
---        Expires = 1;
---    }
-local ActiveGames = {}
---    [UUID HASH] = {
---        Type = "Chess";
---        Players = {p1,p2};
---    }
+
+local ActiveGames = {} :: {[hash]: ActiveGame}
 
 local RS = Api:CreateRSFolder("GamesKit")
 script:WaitForChild("Markdown").Parent = RS
@@ -57,18 +71,18 @@ Api:OnInvoke("GamesKit-GetInfo",function(p,Args)
 end)
 
 function ShuffleTable(t)
-	local shuffled = table.clone(t)
+    local shuffled = table.clone(t)
 
-	for i = #shuffled, 2, -1 do
-		local randomGenerator = Random.new()
-		local randomIndex = math.random(randomGenerator:NextInteger(1, i))
-		shuffled[i], shuffled[randomIndex] = shuffled[randomIndex], shuffled[i]
-	end
+    for i = #shuffled, 2, -1 do
+        local randomGenerator = Random.new()
+        local randomIndex = math.random(randomGenerator:NextInteger(1, i))
+        shuffled[i], shuffled[randomIndex] = shuffled[randomIndex], shuffled[i]
+    end
 
-	return shuffled
+    return shuffled
 end
 
-function StartGame(plrs,gameName)
+function StartGame(plrs: {Players}, gameName: string): hash
     plrs = ShuffleTable(plrs)
     for _,p in pairs(plrs) do
         Api:Notification(p,GameInfo[gameName].Image,"Starting game " .. gameName .. ".")
@@ -81,11 +95,40 @@ function StartGame(plrs,gameName)
     }
     ActiveGames[hash] = tab;
     GameInfo[gameName].StartGame(hash,plrs)
+    return hash;
 end
+
+invites.gameInfo = GameInfo;
+invites.isInGame = function(p: Player): boolean
+    for _,o in pairs(ActiveGames) do
+        for _,plr in pairs(o.Players) do
+            if plr == p then
+                return true;
+            end
+        end
+    end
+    return false;
+end
+invites.joinGame = function(hash: string, p: Player)
+    if ActiveGames[hash] then
+        if not table.find(ActiveGames[hash].Players,p) then
+            table.insert(ActiveGames[hash].Players,p);
+            if typeof(GameInfo[ ActiveGames[hash].Type ].AddPlayer) == "function" then
+                GameInfo[ ActiveGames[hash].Type ].AddPlayer(hash, p);
+            else
+                warn("NO ADD PLAYER FUNCTION FOR " .. ActiveGames[hash].Type);
+            end
+        end
+    else
+        warn("NO ACTIVE GAME FOR HASH " .. hash);
+    end
+end
+invites.startDuel = StartGame;
 
 -- Challenges
 --NOTE: THIS WILL NOT WORK WITH >2 PLAYER GAMES
 Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
+    -- find game
     local found = false;
     for _,g in pairs(GamesList) do
         if string.lower(g) == Args[1] then
@@ -105,73 +148,21 @@ Api:RegisterCommand("challenge","Challenge a player to a game.",function(p,Args)
     end
     if found ~= false then
         local plrs = Api:GetPlayer(Args[2],p)
-        if #plrs == GameInfo[found].PlayersAmt - 1 and #plrs ~= 0 then
-            -- Check if players is not self
-            for _,plr in pairs(plrs) do
-                if plr == p then
-                    Api:Notification(p,false,"Cannot challenge yourself.")
-                    return
-                end
-                -- Check to make sure player is not in a game
-                for _,o in pairs(ActiveGames) do
-                    for _,a in pairs(o.Players) do
-                        if a == p or a == plr then
-                            Api:Notification(p,false,"Player is in a game.")
-                            return
-                        end
-                    end
-                end
-                for _,o in pairs(OpenChallenges) do
-                    for _,a in pairs(o.Players) do
-                        if a == plr and o.Sender == p and o.Expires > os.time() then
-                            Api:Notification(p,false,"Already sent challenge to player.")
-                            return
-                        end
-                    end
-                end
-            end
-            -- Check for duplicates
-            local checkplrs = {}
-            for _,plr in pairs(plrs) do
-                if table.find(checkplrs,plr) then
-                    Api:Notification(p,false,"Duplicated Player.")
-                    return
-                else
-                    table.insert(checkplrs,plr)
-                end
-            end
 
-            -- Send Challenge
-            local challenge = {
-                Type = found;
-                Sender = p;
-                Players = plrs;
-                Expires = os.time() + 61;
-            }
-            Api:Notification(p,GameInfo[found].Image,"Challenge sent.")
-            for _,plr in pairs(plrs) do
-                Api:Notification(plr,GameInfo[found].Image,p.Name .. " has challenged you to a game of " .. found,"Accept Challenge",function()
-                    -- Accept Challenge
-                    if table.find(OpenChallenges,challenge) then
-                        if table.find(OpenChallenges,challenge) then
-                            table.remove(OpenChallenges,table.find(OpenChallenges,challenge))
-                        end
-                        StartGame(plrs,found)
-                    end
-                end,60)
-            end
-            table.insert(plrs,p)
-            table.insert(OpenChallenges,challenge)
-            task.wait(62)
-            -- Expire
-            if table.find(OpenChallenges,challenge) then
-                table.remove(OpenChallenges,table.find(OpenChallenges,challenge))
-            end
-        elseif GameInfo[found].PlayersAmt == 1 then
+        if GameInfo[found].PlayersAmt == 1 then
+            -- Start Game
             StartGame({p},found)
+        elseif GameInfo[found].PlayersAmt == 2 and GameInfo[found].PlayersRequired and #plrs >= 1 then
+            invites:SendInvite(found,p,plrs[1]);
+        elseif GameInfo[found].PlayersAmt >= 2 and not GameInfo[found].PlayersRequired then
+            local hash = StartGame({p},found)
+            for _,plr in pairs(plrs) do
+                invites:SendInvite(found,p,plr,hash);
+            end
         else
-            Api:Notification(p,false,"Invalid amount of players for " .. found .. ", Amount:" .. GameInfo[found].PlayersAmt)
+            Api:Notification(p,false,"Invalid game param, please try sending invite again.")
         end
+
     else
         Api:Notification(p,false,"Game not found")
     end
@@ -187,14 +178,14 @@ game.Players.PlayerRemoving:Connect(function(p)
             end
         end
     end
-    for _,c in pairs(OpenChallenges) do
+    --[[for _,c in pairs(OpenChallenges) do
         if table.find(c.Players,p) then
             -- Remove Challenge
             if table.find(OpenChallenges,c) then
                 table.remove(OpenChallenges,table.find(OpenChallenges,c))
             end
         end
-    end
+    end]]
 end)
 
 Api:OnInvoke("GamesKit-getHowTo",function(p,name)

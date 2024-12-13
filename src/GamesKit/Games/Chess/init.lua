@@ -60,6 +60,7 @@ The objective of chess is to checkmate your opponent's king.
 Chess is a game of strategy and patience. Enjoy the game!
 ]==];
     PlayersAmt = 2;
+    PlayersRequired = true;
 
     StartGame = function(hash: string,plrs: table)
         local p1 = plrs[1]

@@ -39,9 +39,6 @@ Cards can be moved by either Dragging them, clicking on them, or using a keyboar
     StopGame = nil;
 }
 Module.StartGame = function(hash: string,plrs: table)
-    if typeof(Module.StopGame) == "function" then
-        Module.StopGame(hash)
-    end
     -- Ui
     for _,p in pairs(plrs) do
         local ui = script.Ui:Clone()

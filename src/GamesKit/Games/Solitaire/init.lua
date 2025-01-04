@@ -34,7 +34,8 @@ Cards can be moved by either Dragging them, clicking on them, or using a keyboar
     PlayersAmt = 1;
 
     StartGame = nil;
-    EndGame = function(hash: string,p: Player|nil)
+    EndGame = function()
+        return true
     end;
     StopGame = nil;
 }

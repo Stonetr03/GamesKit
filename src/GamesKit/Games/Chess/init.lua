@@ -86,7 +86,7 @@ Chess is a game of strategy and patience. Enjoy the game!
             end
         end)
     end;
-    EndGame = function(hash: string,p: Player|nil)
+    EndGame = function(hash: string,p: Player|nil): boolean
         if GameListeners[hash] then
             if core.Games[hash] and core.Games[hash].Status == "" then
                 if p == core.Games[hash].White or p == core.Games[hash].Black then
@@ -95,6 +95,7 @@ Chess is a game of strategy and patience. Enjoy the game!
             end
             core:Cleanup(hash)
         end
+        return true;
     end;
     StopGame = nil;
 }

@@ -27,13 +27,17 @@ local Module = {
     @param ReceivingPlr Player - Player receiving invite.
     @param hash string? - Represents if a game is already in progress. The lack of a hash value means the game is a duel.
 ]=]
-function Module:SendInvite(gameId: string, sendingPlr: Player, receivingPlr: Player, hash: string?)
-    if Module.isInGame(receivingPlr) then
+function Module:SendInvite(gameId: string, sendingPlr: Player, receivingPlr: Player, hash: string?): boolean
+    if Module.isInGame(receivingPlr) ~= false then
         Api:Notification(sendingPlr,false,"Unable to send game invite to " .. receivingPlr.Name);
         return false
     end
-    if Module.isInGame(sendingPlr) and typeof(hash) ~= "string" then
+    if Module.isInGame(sendingPlr) ~= false and typeof(hash) ~= "string" then
         Api:Notification(sendingPlr,false,"Unable to send game invite while in game.\nLeave game to send a new invite.");
+        return false
+    end
+    if sendingPlr == receivingPlr then
+        Api:Notification(sendingPlr,false,"Cannot invite yourself.");
         return false
     end
     -- Check if invite already sent;
@@ -41,10 +45,10 @@ function Module:SendInvite(gameId: string, sendingPlr: Player, receivingPlr: Pla
         if i.sender == receivingPlr and i.receiving == sendingPlr and i.gameId == gameId then
             -- Accept Invite
             Module:AcceptInvite(i);
-            return;
+            return false;
         elseif i.sender == sendingPlr and i.receiving == receivingPlr and i.gameId == gameId then
             -- already sent
-            return;
+            return false;
         end
     end
 
@@ -56,8 +60,8 @@ function Module:SendInvite(gameId: string, sendingPlr: Player, receivingPlr: Pla
         hash = hash;
     }
     table.insert(Invites,inv);
-    Api:Notification(sendingPlr,Module.GameInfo[gameId].Image,"Challenge to " .. receivingPlr.Name .. " has been sent.");
-    Api:Notification(receivingPlr,Module.GameInfo[gameId].Image, sendingPlr.Name .. " has challenged you to a game of " .. gameId, "Accept Challenge",function()
+    Api:Notification(sendingPlr,Module.gameInfo[gameId].Image,"Challenge to " .. receivingPlr.Name .. " has been sent.");
+    Api:Notification(receivingPlr,Module.gameInfo[gameId].Image, sendingPlr.Name .. " has challenged you to a game of " .. gameId, "Accept Challenge",function()
         -- Accept Invite
         if inv.expires >= os.time() then
             Module:AcceptInvite(inv);
@@ -71,6 +75,7 @@ function Module:SendInvite(gameId: string, sendingPlr: Player, receivingPlr: Pla
             table.remove(Invites,table.find(Invites,inv));
         end
     end);
+    return true
 end
 
 function Module:AcceptInvite(inv: invite)

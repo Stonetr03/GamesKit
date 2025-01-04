@@ -58,7 +58,6 @@ function Module:ShowGui(name: string)
     Window.OnClose:Connect(function()
         gui:Destroy()
         Window.unmount()
-        script:Destroy()
     end)
 
     resize = function()

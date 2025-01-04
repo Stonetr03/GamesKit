@@ -44,7 +44,7 @@ To win, you must create a row, column, or diagonal of three of your marks before
             ui.Parent = p:WaitForChild("PlayerGui")
         end
     end;
-    EndGame = function(hash: string,p: Player|nil)
+    EndGame = function(hash: string,p: Player|nil): boolean
         if ActiveGames[hash] then
             if p == ActiveGames[hash].p1 then
                 ActiveGames[hash].turn = "O"
@@ -60,6 +60,7 @@ To win, you must create a row, column, or diagonal of three of your marks before
             Api:Fire(ActiveGames[hash].p2,"GamesKit-Tic-Tac-Toe",hash,ActiveGames[hash])
             ActiveGames[hash] = nil;
         end
+        return true
     end;
     StopGame = nil;
 }
